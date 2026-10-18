@@ -48,7 +48,7 @@ export function Hero() {
         style={{ y: headY, scale: headScale, opacity: headOpacity }}
         className="relative z-10 flex flex-col items-center px-4 pt-[clamp(7.5rem,24svh,12rem)] text-center md:pt-[clamp(7.5rem,18.5vh,12rem)]"
       >
-        <h1 className="type-display text-[clamp(4rem,11.4vw,13.5rem)] leading-[0.86] text-paper">
+        <h1 className="type-display text-[clamp(4rem,11.4vw,13.5rem)] leading-[0.97] text-paper">
           <HeroLine words={["Every", "shot"]} start={0} />
           <HeroLine words={["knows", "its", "scene"]} start={2} />
         </h1>
