@@ -157,49 +157,14 @@ function Viewfinder() {
   return (
     <div
       aria-hidden
-      className="fade-up pointer-events-none absolute inset-0 z-20 hidden font-script text-[11.5px] tracking-[0.16em] text-paper/45 uppercase md:block [animation-delay:1000ms]"
+      className="fade-up pointer-events-none absolute inset-0 z-20 hidden md:block [animation-delay:1000ms]"
     >
       <Corner className="top-5 left-5 border-t border-l" />
       <Corner className="top-5 right-5 border-t border-r" />
-      <div className="absolute top-[31px] left-12">
-        Sc. 01 <span className="mx-1.5 text-paper/20">/</span> Tk. 01
-      </div>
-      <div className="absolute top-[31px] right-12 flex items-center gap-2">
-        <span className="size-[7px] animate-pulse rounded-full bg-orange" />
-        Rec <Timecode />
-      </div>
     </div>
   );
 }
 
 function Corner({ className }: { className: string }) {
   return <span className={cx("absolute size-6 border-paper/25", className)} />;
-}
-
-function Timecode() {
-  const ref = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    let raf = 0;
-    let last = -1;
-    const start = performance.now();
-    const pad = (n: number) => String(n).padStart(2, "0");
-    const tick = (now: number) => {
-      const frame = Math.floor(((now - start) / 1000) * 24);
-      if (frame !== last && ref.current) {
-        last = frame;
-        const s = Math.floor(frame / 24);
-        ref.current.textContent = `${pad(Math.floor(s / 3600))}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}:${pad(frame % 24)}`;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  return (
-    <span ref={ref} className="tabular-nums">
-      00:00:00:00
-    </span>
-  );
 }
