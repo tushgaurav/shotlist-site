@@ -10,8 +10,6 @@ import {
 } from "motion/react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-import { cx } from "@/lib/site";
-
 import { CAST, SHAPE_RATIO, Shape, type IconKind, type ShapeKind } from "./shapes";
 
 /** Per-shape scroll travel (px), scroll tilt (deg), cursor depth (px) and entry tilt (deg). */
@@ -46,8 +44,6 @@ export function Hero() {
       }}
       className="relative isolate h-[92svh] min-h-[600px] overflow-hidden md:h-[100svh] md:min-h-[640px]"
     >
-      <Viewfinder />
-
       <motion.div
         style={{ y: headY, scale: headScale, opacity: headOpacity }}
         className="relative z-10 flex flex-col items-center px-4 pt-[clamp(7.5rem,24svh,12rem)] text-center md:pt-[clamp(7.5rem,18.5vh,12rem)]"
@@ -151,20 +147,4 @@ function HeroShape({
       </div>
     </motion.div>
   );
-}
-
-function Viewfinder() {
-  return (
-    <div
-      aria-hidden
-      className="fade-up pointer-events-none absolute inset-0 z-20 hidden md:block [animation-delay:1000ms]"
-    >
-      <Corner className="top-5 left-5 border-t border-l" />
-      <Corner className="top-5 right-5 border-t border-r" />
-    </div>
-  );
-}
-
-function Corner({ className }: { className: string }) {
-  return <span className={cx("absolute size-6 border-paper/25", className)} />;
 }
