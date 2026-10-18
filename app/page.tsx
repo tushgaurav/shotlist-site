@@ -1,6 +1,4 @@
 import { Bands } from "@/components/site/bands";
-import { CallSheet } from "@/components/site/call-sheet";
-import { Credits } from "@/components/site/credits";
 import { Features } from "@/components/site/features";
 import { Hero } from "@/components/site/hero";
 import { Nav } from "@/components/site/nav";
@@ -21,9 +19,7 @@ export default function Home() {
         <Problem />
         <Product />
         <Features />
-        <CallSheet />
         <Rolling />
-        <Credits />
       </main>
       <Wrap />
     </>

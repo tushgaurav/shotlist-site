@@ -5,7 +5,6 @@ import { LogoTile, Wordmark } from "./logo";
 const LINKS = [
   { href: "#product", label: "Product" },
   { href: "#features", label: "Features" },
-  { href: "#roadmap", label: "Roadmap" },
   { href: "#setup", label: "Setup" },
 ];
 

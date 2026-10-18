@@ -3,14 +3,12 @@
 import { AnimatePresence, motion, useInView } from "motion/react";
 import { useRef, useState } from "react";
 
-import { Glyph } from "./shapes";
-
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const LINES = [
   { cmd: "git clone git@github.com:tushgaurav/shotlist.git && cd shotlist" },
   { cmd: "npm install" },
-  { cmd: "cp .env.example .env.local", note: "# set DATABASE_URL and BETTER_AUTH_SECRET at minimum" },
+  { cmd: "cp .env.example .env.local", note: "# add DATABASE_URL and BETTER_AUTH_SECRET" },
   { cmd: "npm run db:migrate" },
   { cmd: "npm run dev" },
 ];
@@ -38,14 +36,7 @@ export function Terminal() {
       className="overflow-hidden rounded-[24px] bg-[#0c0c0c] shadow-[0_50px_120px_-40px_rgb(0_0_0/0.95)] ring-1 ring-white/[0.08]"
     >
       <div className="flex items-center justify-between border-b border-white/[0.07] px-4 py-3">
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5" aria-hidden>
-            <Glyph kind="circle" className="h-[11px] text-violet" />
-            <Glyph kind="square" className="h-[11px] text-green" />
-            <Glyph kind="tag" className="h-[11px] text-orange" />
-          </span>
-          <span className="font-script text-[12.5px] text-paper/45">~/shotlist</span>
-        </div>
+        <span className="font-script text-[12.5px] text-paper/40">~/shotlist</span>
         <button
           type="button"
           onClick={copy}

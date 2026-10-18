@@ -270,26 +270,6 @@
   animation: blink 1.05s steps(1) infinite;
 }
 
-@keyframes shimmer {
-  from {
-    background-position: 150% 0;
-  }
-  to {
-    background-position: -50% 0;
-  }
-}
-
-.shimmer {
-  background: linear-gradient(
-      100deg,
-      transparent 20%,
-      rgb(255 255 255 / 0.14) 50%,
-      transparent 80%
-    )
-    0 0 / 200% 100% no-repeat;
-  animation: shimmer 1.2s linear infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

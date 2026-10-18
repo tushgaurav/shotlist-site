@@ -5,16 +5,11 @@ import { useEffect, useReducer, useRef, useState } from "react";
 
 import { cx } from "@/lib/site";
 
-import { Glyph } from "./shapes";
-
 const FIRST = 11;
-const LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-const MAX_SHOTS = 9;
 const EASE = [0.22, 1, 0.36, 1] as const;
 const SPRING = { type: "spring", duration: 0.65, bounce: 0.16 } as const;
 
-type Size = "WS" | "MS" | "MCU" | "CU" | "Insert" | "POV";
-type Shot = { id: string; suffix: string; size: Size; desc: string };
+type Shot = { id: string; label: string; size: string; desc: string };
 type Scene = {
   id: string;
   heading: string;
@@ -25,31 +20,7 @@ type Scene = {
   changed: boolean;
 };
 
-const SIZE_DOT: Record<Size, string> = {
-  WS: "bg-blue",
-  MS: "bg-green",
-  MCU: "bg-violet",
-  CU: "bg-yellow",
-  Insert: "bg-orange",
-  POV: "bg-lime",
-};
-
-const NEW_SHOTS: Array<[Size, string]> = [
-  ["CU", "Reaction"],
-  ["Insert", "Hands, close"],
-  ["MCU", "Over the shoulder"],
-  ["WS", "Wide safety"],
-  ["POV", "Through the glass"],
-  ["MS", "Pickup"],
-];
-
-function scene(
-  id: string,
-  heading: string,
-  original: string,
-  rewrite: string,
-  shots: Array<[Size, string]>,
-): Scene {
+function scene(id: string, heading: string, original: string, rewrite: string, shots: Array<[string, string]>): Scene {
   return {
     id,
     heading,
@@ -57,7 +28,7 @@ function scene(
     original,
     rewrite,
     changed: false,
-    shots: shots.map(([size, desc], i) => ({ id: `${id}-${i}`, suffix: LETTERS[i], size, desc })),
+    shots: shots.map(([size, desc], i) => ({ id: `${id}-${i}`, label: "ABC"[i], size, desc })),
   };
 }
 
@@ -111,7 +82,6 @@ type State = {
   active: string;
   log: { id: number; text: string };
   typing: { id: string; target: string; n: number } | null;
-  added: number;
 };
 
 type Action =
@@ -119,18 +89,16 @@ type Action =
   | { type: "move"; dir: -1 | 1 }
   | { type: "rewrite" }
   | { type: "tick" }
-  | { type: "add" }
   | { type: "review"; id: string }
   | { type: "reset" };
 
-const START_LOG = "Click a scene in the script, then move it, rewrite it, or add a shot.";
+const START_LOG = "Click a scene, then move it or rewrite it.";
 
 const INITIAL: State = {
   scenes: INITIAL_SCENES,
   active: "sc_4b1e",
   log: { id: 0, text: START_LOG },
   typing: null,
-  added: 0,
 };
 
 const place = (heading: string) => heading.split(" - ")[0];
@@ -147,29 +115,22 @@ function reducer(s: State, a: Action): State {
     case "select": {
       if (a.id === s.active || s.typing) return s;
       const k = s.scenes.findIndex((x) => x.id === a.id);
-      return withLog(
-        { ...s, active: a.id },
-        `Cursor in scene ${FIRST + k}. Its ${s.scenes[k].shots.length} shots light up on the right.`,
-      );
+      return withLog({ ...s, active: a.id }, `Scene ${FIRST + k}. Its shots light up on the right.`);
     }
     case "move": {
       const j = i + a.dir;
       if (s.typing || j < 0 || j >= s.scenes.length) return s;
       const scenes = [...s.scenes];
       [scenes[i], scenes[j]] = [scenes[j], scenes[i]];
-      const labels = current.shots.map((sh) => `${FIRST + j}${sh.suffix}`).join(", ");
       return withLog(
         { ...s, scenes },
-        `${place(current.heading)} moved from ${FIRST + i} to ${FIRST + j}. Its shots came along as ${labels}. ID still ${current.id}.`,
+        `${place(current.heading)} is now scene ${FIRST + j}. Its shots followed. The ID didn't change.`,
       );
     }
     case "rewrite": {
       if (s.typing) return s;
       const target = current.text === current.original ? current.rewrite : current.original;
-      return withLog(
-        { ...s, typing: { id: current.id, target, n: 0 } },
-        `Rewriting scene ${FIRST + i}…`,
-      );
+      return withLog({ ...s, typing: { id: current.id, target, n: 0 } }, `Rewriting scene ${FIRST + i}…`);
     }
     case "tick": {
       const typing = s.typing;
@@ -177,43 +138,19 @@ function reducer(s: State, a: Action): State {
       const n = Math.min(typing.n + 2, typing.target.length);
       if (n < typing.target.length) return { ...s, typing: { ...typing, n } };
       const k = s.scenes.findIndex((x) => x.id === typing.id);
-      const scenes = s.scenes.map((x) =>
-        x.id === typing.id ? { ...x, text: typing.target, changed: true } : x,
-      );
-      return withLog(
-        { ...s, scenes, typing: null },
-        `Scene ${FIRST + k} changed, so its ${scenes[k].shots.length} shots are flagged for a second look.`,
-      );
-    }
-    case "add": {
-      if (s.typing || current.shots.length >= MAX_SHOTS) return s;
-      const next = Math.max(-1, ...current.shots.map((sh) => LETTERS.indexOf(sh.suffix))) + 1;
-      const suffix = LETTERS[next];
-      const skipped = suffix === "J" ? "I" : suffix === "P" ? "O" : null;
-      const [size, desc] = NEW_SHOTS[s.added % NEW_SHOTS.length];
-      const shot: Shot = { id: `${current.id}-n${s.added}`, suffix, size, desc };
-      const scenes = s.scenes.map((x) =>
-        x.id === current.id ? { ...x, shots: [...x.shots, shot] } : x,
-      );
-      const label = `${FIRST + i}${suffix}`;
-      return withLog(
-        { ...s, scenes, added: s.added + 1 },
-        skipped
-          ? `Added ${label}. There's no ${FIRST + i}${skipped}: on a slate, I and O read as 1 and 0.`
-          : `Added ${label} to scene ${FIRST + i}.`,
-      );
+      const scenes = s.scenes.map((x) => (x.id === typing.id ? { ...x, text: typing.target, changed: true } : x));
+      return withLog({ ...s, scenes, typing: null }, `Scene ${FIRST + k} changed, so its shots are flagged.`);
     }
     case "review": {
-      const k = s.scenes.findIndex((x) => x.id === a.id);
       const scenes = s.scenes.map((x) => (x.id === a.id ? { ...x, changed: false } : x));
-      return withLog({ ...s, scenes }, `Scene ${FIRST + k} checked. Badge cleared.`);
+      return withLog({ ...s, scenes }, "Checked. Flag cleared.");
     }
     case "reset":
       return { ...INITIAL, log: { id: s.log.id + 1, text: START_LOG } };
   }
 }
 
-type ToolKey = "up" | "down" | "rewrite" | "add";
+type ToolKey = "up" | "down" | "rewrite";
 
 export function Demo() {
   const [state, dispatch] = useReducer(reducer, INITIAL);
@@ -231,8 +168,7 @@ export function Demo() {
   useEffect(() => {
     if (!inView) return;
     const timers: number[] = [];
-    const at = (ms: number, fn: () => void) =>
-      timers.push(window.setTimeout(() => !touched.current && fn(), ms));
+    const at = (ms: number, fn: () => void) => timers.push(window.setTimeout(() => !touched.current && fn(), ms));
     const press = (key: ToolKey, action: Action) => {
       setPressed(key);
       dispatch(action);
@@ -252,7 +188,6 @@ export function Demo() {
 
   const index = state.scenes.findIndex((x) => x.id === state.active);
   const busy = state.typing !== null;
-  const total = state.scenes.reduce((sum, x) => sum + x.shots.length, 0);
 
   const tools: Array<{ key: ToolKey; label: string; icon: React.ReactNode; action: Action; disabled: boolean }> = [
     { key: "up", label: "Move up", icon: <ArrowIcon />, action: { type: "move", dir: -1 }, disabled: busy || index === 0 },
@@ -264,32 +199,15 @@ export function Demo() {
       disabled: busy || index === state.scenes.length - 1,
     },
     { key: "rewrite", label: "Rewrite", icon: <PenIcon />, action: { type: "rewrite" }, disabled: busy },
-    {
-      key: "add",
-      label: "Add shot",
-      icon: <PlusIcon />,
-      action: { type: "add" },
-      disabled: busy || state.scenes[index].shots.length >= MAX_SHOTS,
-    },
   ];
 
   return (
     <div
       ref={rootRef}
-      className="rounded-[30px] border border-white/[0.08] bg-ink-2 p-2 shadow-[0_60px_140px_-50px_rgb(0_0_0/0.9)] sm:p-3"
+      className="rounded-[30px] border border-white/[0.07] bg-ink-2 p-2 shadow-[0_60px_140px_-50px_rgb(0_0_0/0.9)] sm:p-3"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 px-2 pt-1 pb-3 sm:px-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="flex items-center gap-1.5" aria-hidden>
-            <Glyph kind="circle" className="h-[11px] text-violet" />
-            <Glyph kind="square" className="h-[11px] text-green" />
-            <Glyph kind="tag" className="h-[11px] text-orange" />
-          </span>
-          <span className="truncate font-script text-[13px] text-paper/75">midnight-diner</span>
-          <span className="hidden items-center gap-1.5 rounded-full bg-white/[0.06] px-2 py-0.5 text-[11px] text-paper/50 sm:flex">
-            <span className="size-1.5 rounded-full bg-lime" /> Saved
-          </span>
-        </div>
+        <span className="font-script text-[13px] text-paper/50">midnight-diner</span>
         <div className="flex flex-wrap items-center gap-1.5">
           {tools.map((tool) => (
             <button
@@ -298,10 +216,8 @@ export function Demo() {
               disabled={tool.disabled}
               onClick={() => act(tool.action)}
               className={cx(
-                "flex h-9 items-center gap-2 rounded-full px-3 text-[13px] font-medium transition-[transform,background-color,color,opacity] duration-150 ease-out-strong active:scale-[0.97] disabled:pointer-events-none disabled:opacity-30 sm:px-3.5",
-                pressed === tool.key
-                  ? "scale-[0.97] bg-lime text-ink"
-                  : "bg-white/[0.07] text-paper/90 hover:bg-white/[0.13]",
+                "flex h-9 items-center gap-2 rounded-full px-3.5 text-[13px] font-medium transition-[transform,background-color,color,opacity] duration-150 ease-out-strong active:scale-[0.97] disabled:pointer-events-none disabled:opacity-30",
+                pressed === tool.key ? "scale-[0.97] bg-lime text-ink" : "bg-white/[0.07] text-paper/90 hover:bg-white/[0.13]",
               )}
             >
               {tool.icon}
@@ -312,7 +228,7 @@ export function Demo() {
             type="button"
             aria-label="Reset the demo"
             onClick={() => act({ type: "reset" })}
-            className="grid size-9 place-items-center rounded-full bg-white/[0.07] text-paper/70 transition-[transform,background-color] duration-150 ease-out-strong hover:bg-white/[0.13] active:scale-[0.95]"
+            className="grid size-9 place-items-center rounded-full text-paper/50 transition-[transform,color] duration-150 ease-out-strong hover:text-paper active:scale-[0.95]"
           >
             <ResetIcon />
           </button>
@@ -323,7 +239,6 @@ export function Demo() {
         <Paper state={state} onSelect={(id) => act({ type: "select", id })} />
         <ShotPanel
           state={state}
-          total={total}
           onSelect={(id) => act({ type: "select", id })}
           onReview={(id) => act({ type: "review", id })}
         />
@@ -331,9 +246,8 @@ export function Demo() {
 
       <div
         aria-live="polite"
-        className="flex min-h-12 items-center gap-3 px-3 pt-3 pb-1.5 font-script text-[12.5px] text-paper/60 sm:px-4 sm:text-[13px]"
+        className="flex min-h-12 items-center px-3 pt-3 pb-1.5 font-script text-[12.5px] text-paper/50 sm:px-4 sm:text-[13px]"
       >
-        <span className="size-1.5 shrink-0 animate-pulse rounded-full bg-lime" />
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={state.log.id}
@@ -352,14 +266,9 @@ export function Demo() {
 
 function Paper({ state, onSelect }: { state: State; onSelect: (id: string) => void }) {
   return (
-    <div className="relative rounded-[22px] bg-paper px-2 py-6 text-[#1b1b1b] sm:px-5 md:py-9 lg:px-7">
-      <div className="mb-4 flex justify-between px-3 font-script text-[11px] tracking-[0.16em] text-black/40 uppercase">
-        <span>Midnight Diner</span>
-        <span>Draft 3 · p. 7</span>
-      </div>
+    <div className="relative rounded-[22px] bg-paper px-2 py-5 text-[#1b1b1b] sm:px-5 md:py-8 lg:px-7">
       <LayoutGroup id="paper">
         {state.scenes.map((sc, k) => {
-          const n = FIRST + k;
           const active = sc.id === state.active;
           const typing = state.typing?.id === sc.id ? state.typing : null;
           const text = typing ? typing.target.slice(0, typing.n) : sc.text;
@@ -378,7 +287,7 @@ function Paper({ state, onSelect }: { state: State; onSelect: (id: string) => vo
                   <motion.span
                     layoutId="paper-active"
                     transition={SPRING}
-                    className="absolute inset-0 rounded-xl bg-black/[0.055]"
+                    className="absolute inset-0 rounded-xl bg-black/[0.05]"
                   />
                   <motion.span
                     layoutId="paper-bar"
@@ -387,9 +296,9 @@ function Paper({ state, onSelect }: { state: State; onSelect: (id: string) => vo
                   />
                 </>
               )}
-              <span className="relative grid grid-cols-[2.1rem_1fr_2.1rem] items-baseline sm:grid-cols-[2.75rem_1fr_2.75rem]">
+              <span className="relative grid grid-cols-[2.1rem_1fr] items-baseline sm:grid-cols-[2.75rem_1fr]">
                 <span className="font-bold">
-                  <Flip value={n} />
+                  <Flip value={FIRST + k} />
                 </span>
                 <span className="flex items-center gap-2 font-bold uppercase">
                   {sc.heading}
@@ -403,9 +312,6 @@ function Paper({ state, onSelect }: { state: State; onSelect: (id: string) => vo
                       />
                     )}
                   </AnimatePresence>
-                </span>
-                <span className="text-right font-bold">
-                  <Flip value={n} />
                 </span>
                 <span className="col-start-2 mt-1.5 block min-h-[3.2em] text-pretty">
                   {text}
@@ -424,29 +330,16 @@ function Paper({ state, onSelect }: { state: State; onSelect: (id: string) => vo
 
 function ShotPanel({
   state,
-  total,
   onSelect,
   onReview,
 }: {
   state: State;
-  total: number;
   onSelect: (id: string) => void;
   onReview: (id: string) => void;
 }) {
   return (
-    <div className="rounded-[22px] bg-[#1f1f1f] p-2 sm:p-3">
-      <div className="flex items-center justify-between px-2 pt-1 pb-3">
-        <div className="flex items-center gap-2 text-[14px] font-semibold">
-          Shot list
-          <span className="rounded-full bg-white/[0.07] px-2 py-0.5 text-[11px] font-medium text-paper/55 tabular-nums">
-            {total} shots
-          </span>
-        </div>
-        <div aria-hidden className="flex rounded-full bg-white/[0.06] p-0.5 text-[11px] font-medium">
-          <span className="rounded-full bg-paper px-2.5 py-1 text-ink">Table</span>
-          <span className="px-2.5 py-1 text-paper/45">Cards</span>
-        </div>
-      </div>
+    <div className="rounded-[22px] bg-[#1e1e1e] p-2 sm:p-3">
+      <p className="px-2 pt-1 pb-3 text-[14px] font-semibold">Shot list</p>
       <LayoutGroup id="panel">
         <div className="flex flex-col gap-2">
           {state.scenes.map((sc, k) => {
@@ -460,54 +353,39 @@ function ShotPanel({
                 onClick={() => onSelect(sc.id)}
                 className={cx(
                   "relative cursor-pointer rounded-2xl border p-1.5 transition-colors duration-200",
-                  active
-                    ? "border-paper/25 bg-white/[0.05]"
-                    : "border-white/[0.06] hover:border-white/[0.14]",
+                  active ? "border-paper/25 bg-white/[0.04]" : "border-white/[0.06] hover:border-white/[0.14]",
                 )}
               >
                 <header className="flex items-center gap-2 px-1.5 pt-1 pb-1.5">
                   <span className="grid h-6 min-w-8 place-items-center rounded-md bg-paper px-1.5 text-[12px] font-black text-ink tabular-nums">
                     <Flip value={n} />
                   </span>
-                  <span className="min-w-0 truncate font-script text-[12px] text-paper/80 uppercase">
-                    {sc.heading}
-                  </span>
+                  <span className="min-w-0 truncate font-script text-[12px] text-paper/75 uppercase">{sc.heading}</span>
                   <span className="ml-auto flex shrink-0 items-center gap-2">
                     <AnimatePresence initial={false}>
                       {sc.changed && <ChangedBadge onReview={() => onReview(sc.id)} />}
                     </AnimatePresence>
                     <span
                       title="Permanent scene ID. It never changes."
-                      className="hidden font-script text-[11px] text-paper/35 sm:inline"
+                      className="hidden font-script text-[11px] text-paper/30 sm:inline"
                     >
                       {sc.id}
                     </span>
                   </span>
                 </header>
                 <ul>
-                  <AnimatePresence initial={false}>
-                    {sc.shots.map((shot) => (
-                      <motion.li
-                        key={shot.id}
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.35, ease: EASE }}
-                        className="overflow-hidden"
-                      >
-                        <div className="grid grid-cols-[2.9rem_4rem_1fr] items-center gap-2 rounded-lg px-1.5 py-[5px] text-[13px]">
-                          <span className="font-black tracking-tight tabular-nums">
-                            <Flip value={`${n}${shot.suffix}`} />
-                          </span>
-                          <span className="flex items-center gap-1.5 font-script text-[11.5px] text-paper/70">
-                            <span className={cx("size-2 rounded-[3px]", SIZE_DOT[shot.size])} />
-                            {shot.size}
-                          </span>
-                          <span className="truncate text-paper/70">{shot.desc}</span>
-                        </div>
-                      </motion.li>
-                    ))}
-                  </AnimatePresence>
+                  {sc.shots.map((shot) => (
+                    <li
+                      key={shot.id}
+                      className="grid grid-cols-[2.9rem_3.6rem_1fr] items-center gap-2 px-1.5 py-[5px] text-[13px]"
+                    >
+                      <span className="font-black tracking-tight tabular-nums">
+                        <Flip value={`${n}${shot.label}`} />
+                      </span>
+                      <span className="font-script text-[11.5px] text-paper/40">{shot.size}</span>
+                      <span className="truncate text-paper/70">{shot.desc}</span>
+                    </li>
+                  ))}
                 </ul>
               </motion.section>
             );
@@ -532,10 +410,7 @@ function ChangedBadge({ onReview }: { onReview: () => void }) {
       }}
       className="group/badge flex h-6 items-center gap-1.5 rounded-full bg-orange pr-2.5 pl-2 text-[11px] font-semibold whitespace-nowrap text-ink"
     >
-      <span className="relative flex size-1.5">
-        <span className="absolute inset-0 animate-ping rounded-full bg-ink/60" />
-        <span className="relative size-1.5 rounded-full bg-ink" />
-      </span>
+      <span className="size-1.5 rounded-full bg-ink" />
       <span className="group-hover/badge:hidden">Scene changed</span>
       <span className="hidden group-hover/badge:inline">Mark checked</span>
     </motion.button>
@@ -564,7 +439,14 @@ function Flip({ value }: { value: string | number }) {
 function ArrowIcon({ down }: { down?: boolean }) {
   return (
     <svg viewBox="0 0 16 16" className={cx("size-4", down && "rotate-180")} aria-hidden>
-      <path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M8 13V3M3.5 7.5 8 3l4.5 4.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -577,18 +459,17 @@ function PenIcon() {
   );
 }
 
-function PlusIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="size-4" aria-hidden>
-      <path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 function ResetIcon() {
   return (
     <svg viewBox="0 0 16 16" className="size-4" aria-hidden>
-      <path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5V5h2.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5V5h2.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
