@@ -1,5 +1,5 @@
 export const GITHUB_URL = "https://github.com/tushgaurav/shotlist";
-export const LOGIN_URL = "/sign-in";
+export const LOGIN_URL = "https://app.shotlist.io/";
 export const SPEC_URL = "https://github.com/tushgaurav/shotlist/blob/main/docs/spec.md";
 export const AUTHOR_URL = "https://github.com/tushgaurav";
 
