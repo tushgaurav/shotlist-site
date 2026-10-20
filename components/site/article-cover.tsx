@@ -45,6 +45,10 @@ export function ArticleCover({ cover, className }: { cover: ArticlePreview["cove
 
   return (
     <div className={cx("@container relative aspect-[16/10] overflow-hidden", light ? "bg-paper" : "bg-ink-3", className)}>
+      {cover.kind === "photo" ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={cover.src} alt={cover.alt} className={cx("absolute inset-0 size-full object-cover", cover.focus)} />
+      ) : null}
       {cover.kind === "slate" ? <Slate cover={cover} /> : null}
       {cover.kind === "clapper" ? <Clapper cover={cover} /> : null}
       {cover.kind === "finder" ? <Finder cover={cover} /> : null}

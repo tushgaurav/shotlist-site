@@ -1,4 +1,4 @@
-export const CATEGORIES = ["Screenplay", "Shot Lists", "On Set", "Workflow", "Product"] as const;
+export const CATEGORIES = ["Shots", "Camera", "Light"] as const;
 
 export type Category = (typeof CATEGORIES)[number];
 
@@ -20,7 +20,18 @@ export type Cover =
       action: string;
       character: string;
       dialogue: string;
-    });
+    })
+  | {
+      kind: "photo";
+      ground: "ink" | "paper";
+      src: string;
+      alt: string;
+      credit: string;
+      creditHref: string;
+      focus: string;
+    };
+
+export type ArticleBlock = { kind: "h2"; text: string } | { kind: "p"; text: string };
 
 export type ArticlePreview = {
   slug: string;
@@ -34,226 +45,349 @@ export type ArticlePreview = {
 
 export type Article = ArticlePreview & {
   minutes: number;
-  paragraphs: string[];
+  body: ArticleBlock[];
 };
 
-const TUSH = { name: "tushgaurav", role: "Shotlist", avatar: "orange" } as const;
-const LENA = { name: "Lena Voss", role: "1st AD", avatar: "green" } as const;
-const ARUN = { name: "Arun Mehta", role: "Writer", avatar: "violet" } as const;
 const NOOR = { name: "Noor Alami", role: "DP", avatar: "blue" } as const;
 
 export const ARTICLES: Article[] = [
   {
-    slug: "scene-number",
-    title: "A scene number that survives the rewrite",
+    slug: "what-shots-are-called",
+    title: "What the shots are called",
     excerpt:
-      "The number in the margin moves. The scene should not. Pin every shot to an ID that stays put when the draft changes.",
-    category: "Shot Lists",
-    author: TUSH,
-    published: "2026-03-18",
-    minutes: 4,
-    cover: {
-      kind: "slate",
-      ground: "paper",
-      accent: "var(--color-orange)",
-      note: "Scene id",
-      mark: "12A",
-      shape: "circle",
-    },
-    paragraphs: [
-      "The useful thing about a scene is not the number printed in the margin. That number moves. What has to stay put is the identity of the scene, so every shot made for it can still find it after the draft changes.",
-      "Shotlist pins each shot to a scene with an ID that is not reused and not renumbered. Drag scenes, split them, or fold two into one. The shots stay attached to the scene they were written for.",
-      "When a scene’s text changes, its shots are flagged. Nothing is deleted and nothing is quietly rewritten. The flag is a note that the plan and the page have drifted, and that someone should look.",
-      "That is the whole trick. The shot list stops being a copy of the script and starts being a record of decisions made about a scene.",
-    ],
-  },
-  {
-    slug: "slate-skips-i-and-o",
-    title: "Why the slate skips I and O",
-    excerpt:
-      "12A, 12B, 12C. The letters a camera department already expects, minus the two that get misread on a slate.",
-    category: "On Set",
-    author: LENA,
-    published: "2026-03-12",
-    minutes: 3,
-    cover: {
-      kind: "clapper",
-      ground: "ink",
-      accent: "var(--color-green)",
-      note: "Slate",
-      mark: "12B",
-    },
-    paragraphs: [
-      "Camera departments already have a way to name inserts and coverage that share a setup. 12A, 12B, 12C. The letters run in order, and two of them are left out.",
-      "I and O get misread. On a slate, in a hurry, in a log written at 2 a.m., I becomes a 1 and O becomes a 0. So they are skipped. The next letter is the next letter a loader expects.",
-      "A shot list that numbers like a spreadsheet makes the AD translate on set. The translation is where a shot gets called by the wrong name.",
-      "Label them the way the slate will. The board, the script supervisor’s notes, and the files off the card then share one name for the same shot.",
-    ],
-  },
-  {
-    slug: "sluglines",
-    title: "INT. and EXT. should type themselves",
-    excerpt:
-      "Enter and Tab move between elements. A line that starts INT. or EXT. is a slugline, in Courier, the way a script is read.",
-    category: "Screenplay",
-    author: ARUN,
-    published: "2026-03-04",
-    minutes: 3,
-    cover: {
-      kind: "script",
-      ground: "paper",
-      accent: "var(--color-violet)",
-      note: "Courier",
-      slugline: "INT. KITCHEN - NIGHT",
-      action: "Maya sets the pages on the table.",
-      character: "MAYA",
-      dialogue: "It still matches.",
-    },
-    paragraphs: [
-      "A screenplay is a form, not a document with styles painted on. Slugline, action, character, parenthetical, dialogue, transition. The keys that move you between those elements matter more than a toolbar.",
-      "Enter and Tab do that move. A line that starts INT. or EXT. is picked up as a slugline while you type it. The page stays in Courier Prime, which is the face a script is actually read in.",
-      "Formatting applied by hand drifts. Someone bolds a line, someone pastes from a doc, and the scene boundaries the shot list depends on get fuzzy. If the editor knows what a scene is, the plan can know it too.",
-      "You should be thinking about the room, the time of day, and who is in it. Not about which style is selected.",
-    ],
-  },
-  {
-    slug: "beside-the-page",
-    title: "The shot list that lives beside the page",
-    excerpt:
-      "Put the cursor in a scene and its shots are already there. No second window, and no question about which version the row is about.",
-    category: "Workflow",
-    author: TUSH,
-    published: "2026-02-26",
-    minutes: 3,
-    cover: {
-      kind: "finder",
-      ground: "ink",
-      accent: "var(--color-blue)",
-      note: "Same scene",
-      mark: "1:1",
-    },
-    paragraphs: [
-      "The usual setup is two apps and a memory. The script is in one window. The breakdown is in another. You scroll one, then the other, and hope you are still in the same scene.",
-      "Put the cursor in a scene and the shots for that scene are the ones on screen. Leave the scene and the list changes with you. There is no second document to keep in sync, because there is no second document.",
-      "It is a small change in where your eyes go, and it removes the question that wastes the most time in prep: which version is this row about?",
-      "The scene you are writing is the scene you are planning. That should be obvious on the page.",
-    ],
-  },
-  {
-    slug: "reference-frames",
-    title: "Reference frames, stored with the shot",
-    excerpt:
-      "Drop, paste, or click. The frame is resized in the browser and written to your own bucket, next to the shot it describes.",
-    category: "Shot Lists",
+      "How much of a person is in the frame, from a speck in a field to an eye. Then the shots that name a job, not a size.",
+    category: "Shots",
     author: NOOR,
-    published: "2026-02-19",
+    published: "2026-10-16",
     minutes: 4,
     cover: {
-      kind: "slate",
+      kind: "photo",
       ground: "ink",
-      accent: "var(--color-orange)",
-      note: "Frame",
-      mark: "14B",
-      shape: "square",
+      src: "https://images.pexels.com/photos/31329890/pexels-photo-31329890.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      alt: "A cinematographer films a seated actor on a dark stage, with a lamp and a small television between them.",
+      credit: "Dominika Poláková",
+      creditHref: "https://www.pexels.com/photo/creative-film-set-with-cinematographer-and-actor-31329890/",
+      focus: "object-[center_42%]",
     },
-    paragraphs: [
-      "A shot list without a frame is a sentence. Medium, over the shoulder, she looks left. Everyone on the call nods. Everyone is picturing a different frame.",
-      "Drop an image, paste one, or click to add it. It is scaled down in the browser before it is stored, so a still from a 6K camera does not have to travel just to become a thumbnail. It lives in your own S3 bucket, next to the shot it is for.",
-      "The frame is not a mood board floating in a chat. It is attached to 14B. When the scene is flagged because the dialogue changed, the frame is still there to check against the new line.",
-      "Reference is part of the plan. It should travel with the plan, and it should stay in an account you control.",
+    body: [
+      {
+        kind: "p",
+        text: "Shot size is how much of a person the frame holds. It is judged against the body, not against the room and not in meters. A close-up of a face is a close-up whether you stood an arm’s length away or across the street with a long lens. The name follows the frame.",
+      },
+      {
+        kind: "p",
+        text: "On a shot list the short forms are EWS, WS, MLS, MS, MCU, CU, and ECU. Learn the picture each one makes and the abbreviation is enough to write the shot down.",
+      },
+      { kind: "h2", text: "Extreme wide shot" },
+      {
+        kind: "p",
+        text: "The person is small. The place is the subject: a field, a street, a room that dwarfs them. Use it when the viewer needs to know where they are, or when they should feel lost in it. Also called an extreme long shot.",
+      },
+      { kind: "h2", text: "Wide shot" },
+      {
+        kind: "p",
+        text: "The whole body, head to toe, with space around it. You can read where someone stands and how they hold themselves. Also called a long shot. A full shot is the tighter cousin: still head to toe, with less room, so the body fills more of the frame.",
+      },
+      { kind: "h2", text: "Medium long shot" },
+      {
+        kind: "p",
+        text: "From about the knees up. Hands, stance, and face are all available. Westerns framed it this way so the holster stayed in the picture, which is why you will also hear it called a cowboy shot.",
+      },
+      { kind: "h2", text: "Medium shot" },
+      {
+        kind: "p",
+        text: "Waist up. This is the working size for a person doing something with their hands while you still see the face. A conversation can live here when the table, the desk, or the thing between two people belongs in the shot.",
+      },
+      { kind: "h2", text: "Medium close-up" },
+      {
+        kind: "p",
+        text: "Chest up. The usual size for dialogue, and for someone talking to a camera. Expression leads. If their hands come up, the gesture is still in frame.",
+      },
+      { kind: "h2", text: "Close-up" },
+      {
+        kind: "p",
+        text: "The face. The room drops away. Use it when the line, or the reaction to the line, is the point of the shot. A close-up of an object is the same idea: the thing fills the frame and the surroundings go.",
+      },
+      { kind: "h2", text: "Extreme close-up" },
+      {
+        kind: "p",
+        text: "A detail. An eye, a mouth, a hand on a latch, the numbers on a phone. Context is gone on purpose. If the viewer cannot tell what they are looking at, you have gone closer than the shot can carry.",
+      },
+      {
+        kind: "p",
+        text: "Those seven are sizes. The next names can be any size. They describe the job of the shot.",
+      },
+      { kind: "h2", text: "Two-shot" },
+      {
+        kind: "p",
+        text: "Two people in one frame. Wide, medium, or close, the point is that you see both of them, and the space between them, at the same time. A two-shot is how a scene shows a relationship without cutting.",
+      },
+      { kind: "h2", text: "Over-the-shoulder" },
+      {
+        kind: "p",
+        text: "The camera sits behind one person and looks at the other. A shoulder and the back of a head sit in the foreground. The other person’s face is the subject. Written OTS. This is the ordinary way to shoot a conversation so the viewer never loses track of who is talking to whom. Shoot it from both sides and you can cut between them.",
+      },
+      { kind: "h2", text: "Point of view" },
+      {
+        kind: "p",
+        text: "The camera is where that person’s eyes are. The shot shows what they see. A point-of-view shot usually needs the face first, or just after, so the viewer knows whose eyes they borrowed. Written POV.",
+      },
+      { kind: "h2", text: "Insert" },
+      {
+        kind: "p",
+        text: "A close shot of an object that belongs to the action already underway. The page being turned. The key going into the lock. The message on the phone. Cut it in and the hands make sense.",
+      },
+      {
+        kind: "p",
+        text: "A cutaway is the neighbor people mix up with an insert. A cutaway leaves the action for something nearby: a clock, a listener, a dog in the doorway. An insert stays on the thing the scene is already doing.",
+      },
+      { kind: "h2", text: "Establishing shot" },
+      {
+        kind: "p",
+        text: "A shot whose job is to say where the scene is, usually before you move closer. Most establishing shots are wide: a building, a street, the whole room. The name is the job, so a close shot of a sign can establish a place too.",
+      },
     ],
   },
   {
-    slug: "nothing-lands",
-    title: "Nothing lands until you accept it",
+    slug: "what-angles-are-called",
+    title: "What the angles are called",
     excerpt:
-      "⌘K writes at the cursor, or drafts from a logline. The suggestion stays a suggestion until you keep it.",
-    category: "Screenplay",
-    author: ARUN,
-    published: "2026-02-11",
-    minutes: 3,
-    cover: {
-      kind: "finder",
-      ground: "paper",
-      accent: "var(--color-yellow)",
-      note: "Accept",
-      mark: "CMD",
-    },
-    paragraphs: [
-      "⌘K writes at the cursor, or drafts from a logline. Both are useful. Both are easy to trust too quickly.",
-      "The suggestion stays a suggestion. It does not replace the line, and it does not append itself to the scene, until you accept it. Decline it and the page is the page you had.",
-      "That matters more on a rewrite than on a blank page. A model will happily smooth a line you meant to be awkward, or invent a prop that is not in the location. Acceptance is the moment a person decides the draft is still theirs.",
-      "Use it to get a scene out of a standing start. Read what comes back. Keep the sentences you would have written anyway.",
-    ],
-  },
-  {
-    slug: "spreadsheets",
-    title: "Spreadsheets do not survive a rewrite",
-    excerpt:
-      "Scene 12. Page 42. Those pointers are true on the day you typed them. A rewrite turns them into a rumor.",
-    category: "Workflow",
-    author: LENA,
-    published: "2026-02-03",
-    minutes: 4,
-    cover: {
-      kind: "clapper",
-      ground: "paper",
-      accent: "var(--color-lime)",
-      note: "Stale",
-      mark: "P.42",
-    },
-    paragraphs: [
-      "A spreadsheet shot list is a list of pointers. Scene 12. Page 42. The kitchen argument. Those pointers are true on the day you typed them.",
-      "Then the kitchen argument moves to the hallway, scene 12 becomes scene 9, and page 42 is a different scene entirely. The rows are still there. They now describe a script that no longer exists. Nobody deleted them, because they still look finished.",
-      "The failure is quiet. You find it in the production meeting, when two people are talking about different scenes and both of them are reading from the same file.",
-      "Attach the shot to the scene, not to the number the scene had on Tuesday. When the scene moves, the shot moves. When the scene changes, the shot asks to be checked.",
-    ],
-  },
-  {
-    slug: "what-the-ad-exports",
-    title: "What the AD actually exports",
-    excerpt:
-      "Fountain for the script. CSV for the board. Both from the same plan, so the call sheet and the page still agree.",
-    category: "On Set",
+      "Where the camera sits, separate from how close it is. Eye level, high, low, overhead, and a horizon that leans.",
+    category: "Shots",
     author: NOOR,
-    published: "2026-01-22",
-    minutes: 3,
+    published: "2026-10-09",
+    minutes: 2,
     cover: {
-      kind: "slate",
+      kind: "photo",
       ground: "ink",
-      accent: "var(--color-blue)",
-      note: "Handoff",
-      mark: "CSV",
-      shape: "circle",
+      src: "https://images.pexels.com/photos/23512331/pexels-photo-23512331.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      alt: "A low-angle photograph of a woman in a hat, with a glass skyscraper rising behind her.",
+      credit: "Vika Glitter",
+      creditHref: "https://www.pexels.com/photo/low-angle-shot-of-a-woman-standing-in-front-of-a-skyscraper-23512331/",
+      focus: "object-[center_36%]",
     },
-    paragraphs: [
-      "Prep produces two documents people trust. The script, in a form other tools can read. The board, in a form a spreadsheet or a call sheet can take.",
-      "Fountain for the script. CSV for the shots. Both exported from the same plan, so the scene the AD is looking at and the shots under it were true at the same moment.",
-      "Export is not a backup of your private notes. It is the handoff. If the handoff comes from two files that were reconciled by hand, the handoff is already old.",
-      "Write once. Export the forms the day needs. Keep the plan in the place where a rewrite can still find it.",
+    body: [
+      {
+        kind: "p",
+        text: "Angle is the height of the camera and the way it looks. A close-up can be shot from eye level or from the floor. How close the camera is does not decide the angle. The picture at the top of this page is a low angle: the lens is down near the ground, and the building rises behind her.",
+      },
+      { kind: "h2", text: "Eye level" },
+      {
+        kind: "p",
+        text: "The lens sits about as high as the subject’s eyes. This is the view of a person standing there, talking to them. A face at eye level has no chin looming and no forehead looming. Start here. Leave it when you have a reason.",
+      },
+      { kind: "h2", text: "High angle" },
+      {
+        kind: "p",
+        text: "The camera is above the eyes, tilted down. You see the top of the head and more of the floor. The person takes up less of the place. A high angle is still a view a person could have, from a chair, a stair, or a standing height over someone seated.",
+      },
+      { kind: "h2", text: "Low angle" },
+      {
+        kind: "p",
+        text: "The camera is below the eyes, tilted up. You see under the chin. The ceiling, or the sky, replaces the room behind them. The person occupies more of the frame, and whatever they stand in front of gets tall. Hold the camera at your chest, or at your hip, and point it up. That is the angle.",
+      },
+      { kind: "h2", text: "Overhead" },
+      {
+        kind: "p",
+        text: "The camera points straight down. A high angle still has a horizon somewhere. An overhead shot is a plan of the table, the hands, the floor. Far enough away to read as a map, it is also called a bird’s-eye view.",
+      },
+      {
+        kind: "p",
+        text: "The opposite has a name too. A worm’s-eye view puts the lens on the ground, or near it, looking straight up. A low angle looks up at a person. A worm’s-eye view looks up at the world.",
+      },
+      { kind: "h2", text: "Dutch angle" },
+      {
+        kind: "p",
+        text: "The horizon leans. Also called a canted angle. The room looks unsteady because the floor is no longer level in the frame. Use it when you want that unease on purpose. A tripod that was never leveled is the same picture, and it does not get the name as a compliment.",
+      },
     ],
   },
   {
-    slug: "stale-tab",
-    title: "An old tab should not get the last word",
+    slug: "what-moves-are-called",
+    title: "What the moves are called",
     excerpt:
-      "It keeps working when the network doesn’t, and it will not let an old tab overwrite the cut you just made.",
-    category: "Product",
-    author: TUSH,
-    published: "2026-01-14",
+      "Pan and tilt turn the camera. A push and a slide carry it. A zoom stays where it is and magnifies.",
+    category: "Camera",
+    author: NOOR,
+    published: "2026-10-02",
     minutes: 3,
     cover: {
-      kind: "finder",
-      ground: "paper",
-      accent: "var(--color-green)",
-      note: "Refused",
-      mark: "TAB",
+      kind: "photo",
+      ground: "ink",
+      src: "https://images.pexels.com/photos/37259882/pexels-photo-37259882.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      alt: "A cinema camera on a wheeled dolly, sitting on a metal track against a sunlit wall.",
+      credit: "ZvukodiN",
+      creditHref: "https://www.pexels.com/photo/professional-camera-setup-on-dolly-in-studio-37259882/",
+      focus: "object-[28%_62%]",
     },
-    paragraphs: [
-      "Autosave is table stakes until it isn’t. The failure is specific: a tab left open on the train comes back online and writes this morning’s draft over the one you finished at the desk.",
-      "Shotlist keeps working when the connection drops, and it refuses a save that is older than the one already stored. The stale tab does not win.",
-      "You should not have to remember which window is the real one. The file should.",
-      "A location with bad service is a normal day of prep, not an edge case. The page you wrote there has to come home intact, and it has to come home without clobbering the page someone else touched.",
+    body: [
+      {
+        kind: "p",
+        text: "A move is what the camera does during the shot. The names fall into two groups. Some turn the camera while it stays in one spot. Some carry the camera through the room. The rig in the photo is built for the second kind: the camera sits on a dolly, and the dolly rides a track, so the move can be straight and the same on the next take.",
+      },
+      { kind: "h2", text: "Pan" },
+      {
+        kind: "p",
+        text: "The camera stays put and turns left or right. The same motion as turning your head. A pan reveals something that was off to the side, or follows a person walking across the frame. The horizon stays level. If it dips, you added a tilt by accident.",
+      },
+      { kind: "h2", text: "Tilt" },
+      {
+        kind: "p",
+        text: "The camera stays put and tips up or down. The same motion as looking from someone’s shoes to their face. A tilt is vertical. A pan is horizontal. People do them together all the time. Name the one that is doing the work, or write both.",
+      },
+      { kind: "h2", text: "Push in" },
+      {
+        kind: "p",
+        text: "The whole camera moves closer to the subject. Also called a dolly in, from the wheeled platform that carries it. You are walking into the room. Things near the lens grow faster than things far away, so the face and the doorway behind it change their relationship. A push out is the same move backward: the camera retreats, and the place comes back into the frame.",
+      },
+      { kind: "h2", text: "Slide" },
+      {
+        kind: "p",
+        text: "The camera moves sideways and stays about the same distance from the subject. Also called a truck, or a crab. You travel along a table, or alongside someone walking. The subject stays a similar size. The background slips past.",
+      },
+      { kind: "h2", text: "Zoom" },
+      {
+        kind: "p",
+        text: "The camera does not move. The lens changes its focal length, and the subject gets bigger or smaller. You are still standing in the same spot, so the perspective is the perspective of that spot. A zoom in magnifies. A zoom out shows more of the room from where you already are.",
+      },
+      { kind: "h2", text: "A push and a zoom" },
+      {
+        kind: "p",
+        text: "Both can make a face larger. They make different pictures. Walk closer and the nose comes forward, the ears sit back, and the doorway behind them grows at a different rate than the face. Zoom from the doorway and you remain in the doorway. The face is magnified, and its shape is the shape it had from there.",
+      },
+      {
+        kind: "p",
+        text: "If the feeling you want is approach, move the camera. If the feeling you want is a harder look from where you already stand, zoom. Doing both at once, moving in while zooming out, or the reverse, keeps the subject the same size while the room stretches or squeezes. That one is called a dolly zoom.",
+      },
+      { kind: "h2", text: "What holds the camera" },
+      {
+        kind: "p",
+        text: "A tripod, a gimbal, a slider, and a dolly are supports. They are ways of holding the camera. A pan on a tripod and a pan on a gimbal are the same move. The gimbal hides your footsteps. The tripod holds the horizon still. Handheld is a support too: your body. The shake is part of the picture, and the move underneath it is still a pan, a tilt, or a walk toward the subject.",
+      },
+    ],
+  },
+  {
+    slug: "lens-numbers",
+    title: "What the lens numbers mean",
+    excerpt:
+      "24, 35, 50, and 85. What each one does to a face and to a room, including the cameras on a phone.",
+    category: "Camera",
+    author: NOOR,
+    published: "2026-09-25",
+    minutes: 3,
+    cover: {
+      kind: "photo",
+      ground: "ink",
+      src: "https://images.pexels.com/photos/35912546/pexels-photo-35912546.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      alt: "Close-up of a camera lens barrel marked AF 40/2, with an aperture scale from 16 to 2.",
+      credit: "Richard L",
+      creditHref: "https://www.pexels.com/photo/close-up-of-af-40-2-camera-lens-in-studio-light-35912546/",
+      focus: "object-center",
+    },
+    body: [
+      {
+        kind: "p",
+        text: "The number on a lens is the focal length, in millimeters. A smaller number sees more of the room. A larger number sees less of it, and from the same spot the subject looks bigger. The lens in the photo is marked AF 40/2. The 40 is the focal length, a little wider than a 50. The 2 is how wide the aperture opens, which is about light, not about how much of the room you see.",
+      },
+      {
+        kind: "p",
+        text: "The four lenses below are described for a full-frame camera, and for the equivalent number a phone already uses when it labels its cameras. On a camera with a smaller sensor, the number engraved on the lens sees a tighter picture than this list. A 35 on that body behaves closer to a 50.",
+      },
+      { kind: "h2", text: "24mm" },
+      {
+        kind: "p",
+        text: "A wide lens. A room fits. Stand close to a face and the nose comes forward, the ears drop back, and straight lines near the edge of the frame bend. Use a 24 when the place has to be in the shot. When the face is the subject, take a step back before you press record.",
+      },
+      { kind: "h2", text: "35mm" },
+      {
+        kind: "p",
+        text: "Still wide, and a person can stand in it without the face stretching, as long as the lens is not pressed against them. This is the usual lens for a scene in a real room. You see the person, and you see the place they are in. A lot of documentary and a lot of phone video live near here, because the room is part of the story.",
+      },
+      { kind: "h2", text: "50mm" },
+      {
+        kind: "p",
+        text: "A normal lens. From a few steps away, a face looks ordinary: the nose does not loom, and the background does not pile up behind the head. The room is still there, smaller than it was at 24. Of the four, this is the least surprising picture, which is why it is a good default when you do not yet know what you want.",
+      },
+      { kind: "h2", text: "85mm" },
+      {
+        kind: "p",
+        text: "A short telephoto. You stand further back and the face fills the frame. The background gets larger relative to the face, and it falls out of focus more easily. Features sit flatter. Portraits get made here for that reason. In a small room you may not have the distance. If you cannot step back, you are no longer shooting an 85. You are shooting whatever wider lens still fits.",
+      },
+      { kind: "h2", text: "A phone" },
+      {
+        kind: "p",
+        text: "The main camera on most phones is a wide lens, around 24 to 28mm. That is why a face held close to the phone stretches, and why someone talking to the camera shows a deep room behind them. The ultra-wide camera is wider again, often near 13mm. It is a 24 pushed further: more room, more bend at the edges.",
+      },
+      {
+        kind: "p",
+        text: "On a phone with more than one rear camera, the 2x or 3x camera is the closer match to a 50 or an 85. Switching to it changes the picture. Pinching the screen on the main camera only magnifies the wide picture you already have. If a face looks wrong, move your feet before you pinch.",
+      },
+    ],
+  },
+  {
+    slug: "key-fill-backlight",
+    title: "Key, fill, and backlight",
+    excerpt:
+      "Three jobs a light can have, and the difference between a shadow with a hard edge and a shadow that fades.",
+    category: "Light",
+    author: NOOR,
+    published: "2026-09-18",
+    minutes: 3,
+    cover: {
+      kind: "photo",
+      ground: "ink",
+      src: "https://images.pexels.com/photos/36697250/pexels-photo-36697250.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      alt: "A photographer holds a camera beside a large white softbox, photographing a seated man.",
+      credit: "Vitaly Gariev",
+      creditHref: "https://www.pexels.com/photo/indoor-portrait-photography-session-with-studio-lighting-36697250/",
+      focus: "object-[center_45%]",
+    },
+    body: [
+      {
+        kind: "p",
+        text: "A light has a job before it has a name brand. The key makes the shadow. The fill decides how dark that shadow stays. The backlight draws a line between the person and the wall. One window can do the first job alone. A white wall can do the second. You add the third when the person disappears into the background.",
+      },
+      { kind: "h2", text: "Key light" },
+      {
+        kind: "p",
+        text: "The main light on the subject. A window, the sun, a lamp, a softbox. It decides where the shadow of the nose falls. If you can point at one source and say that is the light, that is the key.",
+      },
+      {
+        kind: "p",
+        text: "Put it to one side of the face, a little above the eyes. Then look at the nose. A useful check: the shadow falls down and toward the cheek, and it stops short of the lip. If the shadow crosses the mouth, or covers an eye, move the light. Moving the person is the second resort.",
+      },
+      { kind: "h2", text: "Fill light" },
+      {
+        kind: "p",
+        text: "Light on the shadow side, weaker than the key. It can be a second lamp. It can be a white foam board, a white wall, or a shirt, bouncing the key back into the shadow. Fill does not draw a new direction. It sets how dark the shadow already is.",
+      },
+      {
+        kind: "p",
+        text: "No fill, and the shadow side of the face can go black. Fill that matches the key, and the face goes flat, because no shadow is left to explain the shape of it. Most faces want something in between. If you can still see the eye on the shadow side, you have enough.",
+      },
+      { kind: "h2", text: "Backlight" },
+      {
+        kind: "p",
+        text: "A light from behind the subject, catching the edge of the hair and the shoulder. Also called a rim, or a hair light, when it is only on the hair. It separates a person from a wall that is the same brightness as they are. Dark hair against a dark curtain is the case that needs it.",
+      },
+      {
+        kind: "p",
+        text: "Keep it off the face. A backlight that spills around the cheek becomes a second key, and the nose shadow you just placed starts to fight it.",
+      },
+      { kind: "h2", text: "Hard light and soft light" },
+      {
+        kind: "p",
+        text: "Hard light comes from a small source. Direct sun, a bare bulb, a tiny LED. The edge of the shadow is a line. You can see the shape of the nose in it.",
+      },
+      {
+        kind: "p",
+        text: "Soft light comes from a large source, close to the subject. A big window, an overcast sky, a softbox. The edge of the shadow fades instead of cutting. A window is soft because the window is large. The sun is hard because the sun, from here, is a small disc. The same lamp gets softer when you hang a large white cloth in front of it and move that cloth closer to the person. The white octagon in the photo is a soft key: it is big, and it sits close.",
+      },
+      { kind: "h2", text: "A room you already have" },
+      {
+        kind: "p",
+        text: "Turn the person toward a window, a little off to one side, so the window is the key. Put anything white on the shadow side and the bounce is the fill. If their hair melts into the wall, move them off the wall, or put a small lamp behind them for the rim. Before you roll, look at the nose shadow once. That look tells you whether the key is in the right place.",
+      },
     ],
   },
 ];

@@ -34,7 +34,16 @@ const AVATAR: Record<AvatarColor, { bg: string; fg: string }> = {
 };
 
 function accentOf(cover: Cover) {
+  if (cover.kind === "photo") return "#ff6a3d";
   return ACCENT[cover.accent] ?? "#ff6a3d";
+}
+
+async function photoDataUrl(src: string) {
+  const response = await fetch(src);
+  if (!response.ok) throw new Error(`Could not load cover image (${response.status})`);
+  const type = response.headers.get("content-type")?.split(";")[0] || "image/jpeg";
+  const bytes = Buffer.from(await response.arrayBuffer());
+  return `data:${type};base64,${bytes.toString("base64")}`;
 }
 
 function titleSize(title: string) {
@@ -43,17 +52,18 @@ function titleSize(title: string) {
   return 76;
 }
 
-export function articleOgImage(slug: string) {
+export async function articleOgImage(slug: string) {
   const article = getArticle(slug);
   if (!article) notFound();
+  const photo = article.cover.kind === "photo" ? await photoDataUrl(article.cover.src) : undefined;
 
-  return new ImageResponse(<Card article={article} />, {
+  return new ImageResponse(<Card article={article} photo={photo} />, {
     ...ogSize,
     fonts: ogFonts,
   });
 }
 
-function Card({ article }: { article: Article }) {
+function Card({ article, photo }: { article: Article; photo?: string }) {
   const avatar = AVATAR[article.author.avatar];
 
   return (
@@ -164,13 +174,37 @@ function Card({ article }: { article: Article }) {
         </div>
       </div>
       <div style={{ display: "flex", padding: "28px 28px 28px 0" }}>
-        <CoverPanel cover={article.cover} />
+        <CoverPanel cover={article.cover} photo={photo} />
       </div>
     </div>
   );
 }
 
-function CoverPanel({ cover }: { cover: Cover }) {
+function CoverPanel({ cover, photo }: { cover: Cover; photo?: string }) {
+  if (cover.kind === "photo" && photo) {
+    return (
+      <div
+        style={{
+          width: 420,
+          height: "100%",
+          display: "flex",
+          position: "relative",
+          overflow: "hidden",
+          borderRadius: 28,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={photo}
+          alt=""
+          width={420}
+          height={574}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      </div>
+    );
+  }
+
   const light = cover.ground === "paper";
   const fg = light ? "#121212" : "#f3eee4";
   const muted = light ? "rgba(18,18,18,0.5)" : "rgba(243,238,228,0.55)";

@@ -5,7 +5,7 @@ import { JournalBar } from "@/components/site/journal-bar";
 import { Nav } from "@/components/site/nav";
 import { articlePreviews } from "@/lib/articles";
 
-const description = "How a production keeps the script and the shot list in the same conversation.";
+const description = "Names for the shot, the angle, the move, the lens, and the light.";
 const shareImage = {
   url: "/og.png",
   width: 1200,
@@ -40,7 +40,7 @@ export default function ArticlesPage() {
               Articles
             </h1>
             <p className="fade-up mt-5 max-w-[34rem] text-[clamp(1.05rem,1.25vw,1.2rem)] leading-relaxed text-paper/60 [animation-delay:220ms]">
-              How a production keeps the script and the shot list in the same conversation.
+              Names for the shot, the angle, the move, the lens, and the light.
             </p>
           </header>
           <ArticleIndex articles={articlePreviews()} />

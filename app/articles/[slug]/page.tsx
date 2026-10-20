@@ -86,13 +86,53 @@ export default async function ArticlePage(props: PageProps<"/articles/[slug]">) 
               {article.minutes} min read
             </p>
           </div>
-          <div className={cx("mt-10 overflow-hidden rounded-[20px] ring-1 ring-inset", coverRing(article.cover.ground))}>
-            <ArticleCover cover={article.cover} />
-          </div>
-          <div className="mt-12 max-w-[66ch] space-y-7 text-[1.0625rem] leading-[1.75] text-paper/75">
-            {article.paragraphs.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
+          <figure className="mt-10">
+            <div className={cx("overflow-hidden rounded-[20px] ring-1 ring-inset", coverRing(article.cover.ground))}>
+              <ArticleCover cover={article.cover} />
+            </div>
+            {article.cover.kind === "photo" ? (
+              <figcaption className="mt-2.5 text-[12px] text-paper/40">
+                Photo by{" "}
+                <a
+                  href={article.cover.creditHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline decoration-paper/25 underline-offset-2 transition-colors hover:text-paper/70"
+                >
+                  {article.cover.credit}
+                </a>{" "}
+                on Pexels
+              </figcaption>
+            ) : null}
+          </figure>
+          <div className="mt-12 max-w-[66ch]">
+            {article.body.map((block, index) => {
+              if (block.kind === "h2") {
+                return (
+                  <h2
+                    key={index}
+                    className={cx(
+                      "text-[1.45rem] leading-tight font-extrabold tracking-[-0.03em] text-balance text-paper",
+                      index === 0 ? "mt-0" : "mt-12",
+                    )}
+                  >
+                    {block.text}
+                  </h2>
+                );
+              }
+              const followsHeading = index > 0 && article.body[index - 1]?.kind === "h2";
+              return (
+                <p
+                  key={index}
+                  className={cx(
+                    "text-[1.0625rem] leading-[1.75] text-paper/75",
+                    index === 0 ? "mt-0" : followsHeading ? "mt-3" : "mt-5",
+                  )}
+                >
+                  {block.text}
+                </p>
+              );
+            })}
           </div>
         </article>
 
