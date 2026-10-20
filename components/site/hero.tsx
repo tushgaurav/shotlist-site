@@ -68,7 +68,7 @@ export function Hero() {
     >
       <motion.div
         style={{ y: headY, scale: headScale, opacity: headOpacity }}
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 pb-[clamp(11rem,32vh,17rem)] text-center"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 pb-[clamp(8.5rem,20vh,12rem)] text-center md:pb-[clamp(6rem,14vh,9rem)]"
       >
         <h1 className="text-[clamp(2.4rem,15vw,4.75rem)] leading-[0.94] tracking-[-0.038em] text-paper [font-stretch:100%] [font-weight:750] md:text-[clamp(4.25rem,8.6vw,11rem)]">
           <span className="block">
