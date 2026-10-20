@@ -1,4 +1,4 @@
-import { Reveal, SlateLabel, SplitHeading } from "./reveal";
+import { Reveal, SplitHeading } from "./reveal";
 import { Terminal } from "./terminal";
 
 const STACK = [
@@ -18,10 +18,9 @@ export function Rolling() {
     <section id="setup" className="px-5 py-[clamp(5rem,10vw,9rem)] md:px-10">
       <div className="mx-auto grid max-w-[1320px] items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
         <div>
-          <SlateLabel scene="04">Rolling</SlateLabel>
           <SplitHeading
             lines={["Roll your", "own."]}
-            className="type-display mt-7 text-[clamp(2.7rem,6.4vw,7rem)] leading-[0.95]"
+            className="type-display text-[clamp(2.7rem,6.4vw,7rem)] leading-[0.95]"
           />
           <Reveal delay={0.1} className="mt-8 max-w-[26rem] text-[clamp(1.05rem,1.25vw,1.2rem)] leading-relaxed text-paper/60">
             Open source and self-hosted. You need Node 22+ and Postgres. S3 and an{" "}

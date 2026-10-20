@@ -1,15 +1,14 @@
 import { Demo } from "./demo";
-import { Reveal, SlateLabel, SplitHeading } from "./reveal";
+import { Reveal, SplitHeading } from "./reveal";
 
 export function Product() {
   return (
     <section id="product" className="px-3 py-[clamp(5rem,10vw,9rem)] md:px-6">
       <div className="mx-auto max-w-[1320px]">
         <div className="px-2 md:px-4">
-          <SlateLabel scene="02">The fix</SlateLabel>
           <SplitHeading
             lines={["Shots that stay", "with their scene."]}
-            className="type-display mt-7 text-[clamp(2.7rem,8.2vw,9.25rem)] leading-[0.95]"
+            className="type-display text-[clamp(2.7rem,8.2vw,9.25rem)] leading-[0.95]"
           />
           <Reveal
             delay={0.15}

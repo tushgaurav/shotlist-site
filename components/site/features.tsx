@@ -1,6 +1,6 @@
 import { SPEC_URL, cx } from "@/lib/site";
 
-import { Reveal, SlateLabel, SplitHeading } from "./reveal";
+import { Reveal, SplitHeading } from "./reveal";
 import { Glyph, type ShapeKind } from "./shapes";
 
 const FEATURES: Array<{ title: string; body: string; glyph: ShapeKind; color: string }> = [
@@ -47,10 +47,9 @@ export function Features() {
     <section id="features" className="px-5 py-[clamp(5rem,10vw,9rem)] md:px-10">
       <div className="mx-auto grid max-w-[1320px] gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
         <div className="lg:sticky lg:top-32 lg:self-start">
-          <SlateLabel scene="03">In the can</SlateLabel>
           <SplitHeading
             lines={["Already", "in the can."]}
-            className="type-display mt-7 text-[clamp(2.7rem,6.4vw,7rem)] leading-[0.95]"
+            className="type-display text-[clamp(2.7rem,6.4vw,7rem)] leading-[0.95]"
           />
           <Reveal delay={0.1} className="mt-8 max-w-[24rem] text-[clamp(1.05rem,1.25vw,1.2rem)] leading-relaxed text-paper/60">
             Everything here works today.

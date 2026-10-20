@@ -3,8 +3,6 @@
 import { motion, useInView } from "motion/react";
 import { useRef } from "react";
 
-import { cx } from "@/lib/site";
-
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function Reveal({
@@ -84,29 +82,5 @@ export function SplitHeading({
         </span>
       ))}
     </Tag>
-  );
-}
-
-export function SlateLabel({
-  scene,
-  children,
-  className,
-}: {
-  scene: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <Reveal
-      className={cx(
-        "inline-flex items-center gap-3 rounded-full border border-paper/15 py-1 pr-4 pl-1 font-script text-[12px] tracking-[0.14em] text-paper/70 uppercase",
-        className,
-      )}
-    >
-      <span className="rounded-full bg-paper px-2.5 py-1 leading-none font-bold text-ink">
-        Sc. {scene}
-      </span>
-      {children}
-    </Reveal>
   );
 }
