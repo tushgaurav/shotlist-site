@@ -18,10 +18,34 @@ const courier = Courier_Prime({
   style: ["normal", "italic"],
 });
 
+const title = "shotlist - Production planning, simplified.";
+const description =
+  "A screenplay editor and a shot list that actually talk to each other. Every shot is pinned to its scene, so rewrites never break your plan. Open source and self-hosted.";
+
 export const metadata: Metadata = {
-  title: "shotlist - Production planning, simplified.",
-  description:
-    "A screenplay editor and a shot list that actually talk to each other. Every shot is pinned to its scene, so rewrites never break your plan. Open source and self-hosted.",
+  metadataBase: new URL("https://shotlist.video"),
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    siteName: "shotlist",
+    type: "website",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: title,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/og.png"],
+  },
 };
 
 export const viewport: Viewport = {
