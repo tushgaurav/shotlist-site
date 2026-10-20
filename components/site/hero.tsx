@@ -70,7 +70,7 @@ export function Hero() {
         style={{ y: headY, scale: headScale, opacity: headOpacity }}
         className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 pb-[clamp(8rem,26vh,15rem)] text-center"
       >
-        <h1 className="type-display text-[clamp(2.4rem,15vw,4.75rem)] leading-[0.9] text-paper md:text-[clamp(4.25rem,8.6vw,11rem)]">
+        <h1 className="text-[clamp(2.4rem,15vw,4.75rem)] leading-[0.94] tracking-[-0.038em] text-paper [font-stretch:100%] [font-weight:750] md:text-[clamp(4.25rem,8.6vw,11rem)]">
           <span className="block">
             <HeroWord word="Production" index={0} />
             <br className="md:hidden" />
