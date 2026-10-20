@@ -6,6 +6,7 @@ import { useEffect, useId, useState } from "react";
 import { setScrollLocked } from "@/lib/scroll-lock";
 import { GITHUB_URL, cx } from "@/lib/site";
 
+import { GitHubIcon } from "./github-icon";
 import { LogoTile, Wordmark } from "./logo";
 
 const LINKS = [
@@ -108,8 +109,9 @@ export function Nav() {
             href={GITHUB_URL}
             target="_blank"
             rel="noreferrer"
-            className="ml-[1.6rem] flex h-11 shrink-0 items-center rounded-full bg-lime px-4 text-[13px] font-semibold text-ink transition-transform duration-150 ease-out-strong hover:scale-[1.03] active:scale-[0.97] sm:px-5"
+            className="ml-[1.6rem] flex h-11 shrink-0 items-center gap-2 rounded-full bg-lime px-4 text-[13px] font-semibold text-ink transition-transform duration-150 ease-out-strong hover:scale-[1.03] active:scale-[0.97] sm:px-5"
           >
+            <GitHubIcon className="size-4" />
             Get the code
           </a>
         </nav>

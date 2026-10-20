@@ -10,7 +10,7 @@ import {
 } from "motion/react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-import { cx } from "@/lib/site";
+import { LOGIN_URL, cx } from "@/lib/site";
 
 import { CAST, SHAPE_RATIO, Shape, type IconKind, type ShapeKind } from "./shapes";
 
@@ -68,7 +68,7 @@ export function Hero() {
     >
       <motion.div
         style={{ y: headY, scale: headScale, opacity: headOpacity }}
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 pb-[clamp(8rem,26vh,15rem)] text-center"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 pb-[clamp(11rem,32vh,17rem)] text-center"
       >
         <h1 className="text-[clamp(2.4rem,15vw,4.75rem)] leading-[0.94] tracking-[-0.038em] text-paper [font-stretch:100%] [font-weight:750] md:text-[clamp(4.25rem,8.6vw,11rem)]">
           <span className="block">
@@ -79,9 +79,15 @@ export function Hero() {
           </span>
           <HeroLine words={["simplified."]} start={2} />
         </h1>
-        <p className="fade-up mt-[clamp(1.25rem,3vh,2rem)] max-w-[18rem] text-[clamp(1.05rem,1.35vw,1.3rem)] leading-snug text-balance text-paper/70 sm:max-w-[36rem] [animation-delay:560ms]">
-          The workspace for modern video production
+        <p className="fade-up mt-[clamp(1.25rem,3vh,2rem)] max-w-[22rem] text-[clamp(1.05rem,1.35vw,1.3rem)] leading-snug text-balance text-paper/70 sm:max-w-[40rem] [animation-delay:560ms]">
+          The workspace for modern video production, where the script and the shot list stay in sync.
         </p>
+        <a
+          href={LOGIN_URL}
+          className="fade-up mt-6 flex h-11 items-center rounded-full bg-lime px-5 text-[13px] font-semibold text-ink transition-transform duration-150 ease-out-strong hover:scale-[1.03] active:scale-[0.97] sm:mt-7 sm:h-12 sm:px-6 sm:text-[14px] [animation-delay:720ms]"
+        >
+          Log In
+        </a>
       </motion.div>
 
       <div className="hero-cast absolute inset-x-0 bottom-0 [--s:clamp(165px,19vw,420px)] max-md:grid max-md:grid-cols-3 max-md:items-end max-md:px-4 max-md:pb-8 md:flex md:translate-y-[30%] md:justify-center md:gap-[clamp(8px,1vw,16px)]">
