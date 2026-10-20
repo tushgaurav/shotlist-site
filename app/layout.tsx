@@ -19,7 +19,7 @@ const courier = Courier_Prime({
 });
 
 export const metadata: Metadata = {
-  title: "Shotlist — Write the script. Plan the shots. Wrap on time.",
+  title: "shotlist - Production planning, simplified.",
   description:
     "A screenplay editor and a shot list that actually talk to each other. Every shot is pinned to its scene, so rewrites never break your plan. Open source and self-hosted.",
 };
