@@ -67,7 +67,7 @@ export function Wrap() {
         </div>
       </div>
 
-      <div className="relative flex h-[calc(var(--s)*0.62)] justify-center gap-[clamp(8px,1vw,16px)] [--s:clamp(140px,17vw,360px)]">
+      <div className="relative flex h-[calc(var(--s)*0.62)] justify-center gap-[clamp(6px,1vw,16px)] [--s:clamp(48px,15.4vw,120px)] md:[--s:clamp(140px,17vw,360px)]">
         {[...CAST].reverse().map((c, i) => (
           <CurtainShape key={c.icon} index={i} kind={c.kind} icon={c.icon} color={c.color} progress={scrollYProgress} />
         ))}

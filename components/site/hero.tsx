@@ -10,6 +10,8 @@ import {
 } from "motion/react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
+import { cx } from "@/lib/site";
+
 import { CAST, SHAPE_RATIO, Shape, type IconKind, type ShapeKind } from "./shapes";
 
 /** Per-shape scroll travel (px), scroll tilt (deg), cursor depth (px) and entry tilt (deg). */
@@ -21,6 +23,26 @@ const PARALLAX = [
   { y: -170, r: -9, depth: 24, r0: -12 },
 ];
 const ENTRY_ORDER = [2, 1, 0, 1, 2];
+
+const MOBILE_PLACE = [
+  "max-md:col-start-1 max-md:row-start-1 max-md:z-10 max-md:min-w-0 max-md:justify-self-start max-md:!h-[clamp(60px,18vw,108px)]",
+  "max-md:col-start-1 max-md:row-start-2 max-md:z-20 max-md:-mt-2 max-md:min-w-0 max-md:justify-self-start max-md:!h-[clamp(84px,26vw,148px)]",
+  "max-md:col-start-2 max-md:row-start-2 max-md:z-30 max-md:-mt-2 max-md:min-w-0 max-md:justify-self-center max-md:!h-[clamp(84px,26vw,148px)]",
+  "max-md:col-start-3 max-md:row-start-2 max-md:z-20 max-md:-mt-2 max-md:min-w-0 max-md:justify-self-end max-md:!h-[clamp(84px,26vw,148px)]",
+  "max-md:col-start-3 max-md:row-start-1 max-md:z-10 max-md:min-w-0 max-md:justify-self-end max-md:!h-[clamp(60px,18vw,108px)]",
+];
+
+const MOBILE_TILT = [
+  "max-md:-rotate-8",
+  "max-md:rotate-[4deg]",
+  "max-md:-rotate-[2deg]",
+  "max-md:-rotate-[5deg]",
+  "max-md:rotate-[7deg]",
+];
+
+function isPhone() {
+  return typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
+}
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -46,18 +68,23 @@ export function Hero() {
     >
       <motion.div
         style={{ y: headY, scale: headScale, opacity: headOpacity }}
-        className="relative z-10 flex flex-col items-center px-4 pt-[clamp(7.5rem,24svh,12rem)] text-center md:pt-[clamp(7.5rem,18.5vh,12rem)]"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 pb-[clamp(8rem,26vh,15rem)] text-center"
       >
-        <h1 className="type-display text-[clamp(4rem,11.4vw,13.5rem)] leading-[0.97] text-paper">
-          <HeroLine words={["Every", "shot"]} start={0} />
-          <HeroLine words={["knows", "its", "scene"]} start={2} />
+        <h1 className="type-display text-[clamp(2.4rem,15vw,4.75rem)] leading-[0.9] text-paper md:text-[clamp(4.25rem,8.6vw,11rem)]">
+          <span className="block">
+            <HeroWord word="Production" index={0} />
+            <br className="md:hidden" />
+            <span className="max-md:hidden"> </span>
+            <HeroWord word="planning," index={1} />
+          </span>
+          <HeroLine words={["simplified."]} start={2} />
         </h1>
-        <p className="fade-up mt-[clamp(1.4rem,3.4vh,2.25rem)] max-w-[24rem] text-[clamp(1rem,1.2vw,1.15rem)] leading-snug text-balance text-paper/70 [animation-delay:720ms]">
-          A screenplay editor and a shot list that actually talk to each other.
+        <p className="fade-up mt-[clamp(1.25rem,3vh,2rem)] max-w-[18rem] text-[clamp(1.05rem,1.35vw,1.3rem)] leading-snug text-balance text-paper/70 sm:max-w-[36rem] [animation-delay:560ms]">
+          The workspace for modern video production
         </p>
       </motion.div>
 
-      <div className="absolute inset-x-0 bottom-0 flex translate-y-[30%] justify-center gap-[clamp(8px,1vw,16px)] [--s:clamp(165px,19vw,420px)]">
+      <div className="hero-cast absolute inset-x-0 bottom-0 [--s:clamp(165px,19vw,420px)] max-md:grid max-md:grid-cols-3 max-md:items-end max-md:px-4 max-md:pb-8 md:flex md:translate-y-[30%] md:justify-center md:gap-[clamp(8px,1vw,16px)]">
         {CAST.map((c, i) => (
           <HeroShape
             key={c.icon}
@@ -75,16 +102,22 @@ export function Hero() {
   );
 }
 
+function HeroWord({ word, index }: { word: string; index: number }) {
+  return (
+    <span className="-mx-[0.06em] -mb-[0.14em] inline-block overflow-hidden px-[0.06em] pb-[0.14em] align-top">
+      <span className="hero-word" style={{ animationDelay: `${160 + index * 80}ms` }}>
+        {word}
+      </span>
+    </span>
+  );
+}
+
 function HeroLine({ words, start }: { words: string[]; start: number }) {
   return (
     <span className="block">
       {words.map((word, i) => (
         <span key={word}>
-          <span className="-mx-[0.06em] -mb-[0.14em] inline-block overflow-hidden px-[0.06em] pb-[0.14em] align-top">
-            <span className="hero-word" style={{ animationDelay: `${160 + (start + i) * 80}ms` }}>
-              {word}
-            </span>
-          </span>
+          <HeroWord word={word} index={start + i} />
           {i < words.length - 1 ? " " : null}
         </span>
       ))}
@@ -110,8 +143,8 @@ function HeroShape({
   sy: MotionValue<number>;
 }) {
   const p = PARALLAX[index];
-  const scrollY = useTransform(progress, [0, 1], [0, p.y]);
-  const rotate = useTransform(progress, [0, 1], [0, p.r]);
+  const scrollY = useTransform(progress, (v) => v * (isPhone() ? -20 : p.y));
+  const rotate = useTransform(progress, (v) => v * (isPhone() ? 0 : p.r));
   const x = useTransform(sx, (v) => v * p.depth);
   const y = useTransform([scrollY, sy], ([a, b]: number[]) => a + b * p.depth * 0.6);
   const [clap, setClap] = useState(false);
@@ -130,7 +163,7 @@ function HeroShape({
     <motion.div
       data-clap={clap || undefined}
       style={{ x, y, rotate, height: "var(--s)", aspectRatio: SHAPE_RATIO[kind] }}
-      className="shape-host shrink-0"
+      className={cx("shape-host md:shrink-0", MOBILE_PLACE[index])}
     >
       <div
         className="shape-rise size-full"
@@ -142,7 +175,9 @@ function HeroShape({
         }
       >
         <div className="bob size-full" style={{ animationDelay: `${index * -1.45}s` }}>
-          <Shape kind={kind} icon={icon} color={color} />
+          <div className={cx("size-full", MOBILE_TILT[index])}>
+            <Shape kind={kind} icon={icon} color={color} />
+          </div>
         </div>
       </div>
     </motion.div>
