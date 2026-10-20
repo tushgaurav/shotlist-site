@@ -1,6 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 
 import { setScrollLocked } from "@/lib/scroll-lock";
@@ -10,9 +12,10 @@ import { GitHubIcon } from "./github-icon";
 import { LogoTile, Wordmark } from "./logo";
 
 const LINKS = [
-  { href: "#product", label: "Product" },
-  { href: "#features", label: "Features" },
-  { href: "#setup", label: "Setup" },
+  { href: "/#product", label: "Product" },
+  { href: "/#features", label: "Features" },
+  { href: "/articles", label: "Articles" },
+  { href: "/#setup", label: "Setup" },
 ];
 
 const EASE = [0.23, 1, 0.32, 1] as const;
@@ -20,6 +23,7 @@ const EASE = [0.23, 1, 0.32, 1] as const;
 export function Nav() {
   const [open, setOpen] = useState(false);
   const menuId = useId();
+  const pathname = usePathname();
 
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 768px)");
@@ -62,26 +66,48 @@ export function Nav() {
       <header className="drop-in pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 [animation-delay:150ms]">
         <nav aria-label="Main" className="pointer-events-auto flex items-center">
           <div className="relative flex h-11 items-center rounded-l-[13px] bg-[#232323] pr-1 pl-1.5 shadow-[0_10px_30px_-12px_rgb(0_0_0/0.7)]">
-            <a
-              href="#top"
-              aria-label="Shotlist, back to top"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-lg pr-2 transition-opacity duration-200 hover:opacity-80 sm:pr-3"
-            >
-              <LogoTile className="size-8" />
-              <Wordmark className="hidden h-[15px] text-paper sm:block" title="" />
-            </a>
+            {pathname === "/" ? (
+              <a
+                href="#top"
+                aria-label="Shotlist, back to top"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 rounded-lg pr-2 transition-opacity duration-200 hover:opacity-80 sm:pr-3"
+              >
+                <LogoTile className="size-8" />
+                <Wordmark className="hidden h-[15px] text-paper sm:block" title="" />
+              </a>
+            ) : (
+              <Link
+                href="/"
+                aria-label="Shotlist, back to top"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 rounded-lg pr-2 transition-opacity duration-200 hover:opacity-80 sm:pr-3"
+              >
+                <LogoTile className="size-8" />
+                <Wordmark className="hidden h-[15px] text-paper sm:block" title="" />
+              </Link>
+            )}
             <ul className="hidden items-center md:flex">
-              {LINKS.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="block rounded-md px-3 py-2 text-[13px] font-medium text-paper/70 transition-colors duration-200 hover:text-paper"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+              {LINKS.map((link) => {
+                const current = link.href === "/articles" && pathname.startsWith("/articles");
+                const className = cx(
+                  "block rounded-md px-3 py-2 text-[13px] font-medium transition-colors duration-200",
+                  current ? "text-paper" : "text-paper/70 hover:text-paper",
+                );
+                return (
+                  <li key={link.href}>
+                    {link.href === "/articles" ? (
+                      <Link href={link.href} className={className} aria-current={current ? "page" : undefined}>
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href} className={className}>
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
             <button
               type="button"
@@ -139,16 +165,26 @@ export function Nav() {
                   transition={{ duration: 0.5, delay: 0.06 + index * 0.05, ease: EASE }}
                   className="border-b border-paper/10"
                 >
-                  <a
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    className="flex items-start gap-4 py-5"
-                  >
-                    <span className="w-7 pt-3 font-script text-[13px] text-paper/35">0{index + 1}</span>
-                    <span className="type-display text-[clamp(3rem,13vw,4.75rem)] leading-[0.9]">
-                      {link.label}
-                    </span>
-                  </a>
+                  {link.href === "/articles" ? (
+                    <Link
+                      href={link.href}
+                      onClick={() => setOpen(false)}
+                      aria-current={pathname.startsWith("/articles") ? "page" : undefined}
+                      className="flex items-start gap-4 py-5"
+                    >
+                      <span className="w-7 pt-3 font-script text-[13px] text-paper/35">0{index + 1}</span>
+                      <span className="type-display text-[clamp(3rem,13vw,4.75rem)] leading-[0.9]">
+                        {link.label}
+                      </span>
+                    </Link>
+                  ) : (
+                    <a href={link.href} onClick={() => setOpen(false)} className="flex items-start gap-4 py-5">
+                      <span className="w-7 pt-3 font-script text-[13px] text-paper/35">0{index + 1}</span>
+                      <span className="type-display text-[clamp(3rem,13vw,4.75rem)] leading-[0.9]">
+                        {link.label}
+                      </span>
+                    </a>
+                  )}
                 </motion.li>
               ))}
             </ul>

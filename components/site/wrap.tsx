@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
+import Link from "next/link";
 import { useRef } from "react";
 
 import { AUTHOR_URL, GITHUB_URL, SPEC_URL } from "@/lib/site";
@@ -56,6 +57,9 @@ export function Wrap() {
           <span>© 2026</span>
         </div>
         <div className="flex items-center gap-5">
+          <Link href="/articles" className="transition-colors hover:text-paper">
+            Articles
+          </Link>
           <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="transition-colors hover:text-paper">
             GitHub
           </a>
