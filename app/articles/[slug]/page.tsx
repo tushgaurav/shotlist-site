@@ -20,6 +20,18 @@ export async function generateMetadata(props: PageProps<"/articles/[slug]">): Pr
   return {
     title: `shotlist - ${article.title}`,
     description: article.excerpt,
+    openGraph: {
+      title: article.title,
+      description: article.excerpt,
+      type: "article",
+      publishedTime: article.published,
+      authors: [article.author.name],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt,
+    },
   };
 }
 

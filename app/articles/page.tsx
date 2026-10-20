@@ -5,9 +5,28 @@ import { JournalBar } from "@/components/site/journal-bar";
 import { Nav } from "@/components/site/nav";
 import { articlePreviews } from "@/lib/articles";
 
+const description = "How a production keeps the script and the shot list in the same conversation.";
+const shareImage = {
+  url: "/og.png",
+  width: 1200,
+  height: 630,
+  alt: "shotlist - Production planning, simplified.",
+};
+
 export const metadata: Metadata = {
   title: "shotlist - Articles",
-  description: "How a production keeps the script and the shot list in the same conversation.",
+  description,
+  openGraph: {
+    title: "Articles",
+    description,
+    images: [shareImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Articles",
+    description,
+    images: [shareImage.url],
+  },
 };
 
 export default function ArticlesPage() {
