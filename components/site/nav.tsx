@@ -65,7 +65,7 @@ export function Nav() {
     <>
       <header className="drop-in pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 [animation-delay:150ms]">
         <nav aria-label="Main" className="pointer-events-auto flex items-center">
-          <div className="relative flex h-11 items-center rounded-l-[13px] bg-[#232323] pr-1 pl-1.5 shadow-[0_10px_30px_-12px_rgb(0_0_0/0.7)]">
+          <div className="relative flex h-11 items-center rounded-[13px] bg-[#232323] pr-1 pl-1.5 shadow-[0_10px_30px_-12px_rgb(0_0_0/0.7)] md:rounded-l-[13px]">
             {pathname === "/" ? (
               <a
                 href="#top"
@@ -74,7 +74,7 @@ export function Nav() {
                 className="flex items-center gap-2.5 rounded-lg pr-2 transition-opacity duration-200 hover:opacity-80 sm:pr-3"
               >
                 <LogoTile className="size-8" />
-                <Wordmark className="hidden h-[15px] text-paper sm:block" title="" />
+                <Wordmark className="h-[15px] text-paper" title="" />
               </a>
             ) : (
               <Link
@@ -84,7 +84,7 @@ export function Nav() {
                 className="flex items-center gap-2.5 rounded-lg pr-2 transition-opacity duration-200 hover:opacity-80 sm:pr-3"
               >
                 <LogoTile className="size-8" />
-                <Wordmark className="hidden h-[15px] text-paper sm:block" title="" />
+                <Wordmark className="h-[15px] text-paper" title="" />
               </Link>
             )}
             <ul className="hidden items-center md:flex">
@@ -122,7 +122,7 @@ export function Nav() {
             <svg
               aria-hidden
               viewBox="0 0 16 44"
-              className="absolute top-0 left-full h-11 w-4"
+              className="absolute top-0 left-full hidden h-11 w-4 md:block"
               preserveAspectRatio="none"
             >
               <path
@@ -135,7 +135,7 @@ export function Nav() {
             href={GITHUB_URL}
             target="_blank"
             rel="noreferrer"
-            className="ml-[1.6rem] flex h-11 shrink-0 items-center gap-2 rounded-full bg-lime px-4 text-[13px] font-semibold text-ink transition-transform duration-150 ease-out-strong hover:scale-[1.03] active:scale-[0.97] sm:px-5"
+            className="ml-[1.6rem] hidden h-11 shrink-0 items-center gap-2 rounded-full bg-lime px-4 text-[13px] font-semibold text-ink transition-transform duration-150 ease-out-strong hover:scale-[1.03] active:scale-[0.97] sm:px-5 md:flex"
           >
             <GitHubIcon className="size-4" />
             Get the code
@@ -170,16 +170,14 @@ export function Nav() {
                       href={link.href}
                       onClick={() => setOpen(false)}
                       aria-current={pathname.startsWith("/articles") ? "page" : undefined}
-                      className="flex items-start gap-4 py-5"
+                      className="block py-5"
                     >
-                      <span className="w-7 pt-3 font-script text-[13px] text-paper/35">0{index + 1}</span>
                       <span className="type-display text-[clamp(3rem,13vw,4.75rem)] leading-[0.9]">
                         {link.label}
                       </span>
                     </Link>
                   ) : (
-                    <a href={link.href} onClick={() => setOpen(false)} className="flex items-start gap-4 py-5">
-                      <span className="w-7 pt-3 font-script text-[13px] text-paper/35">0{index + 1}</span>
+                    <a href={link.href} onClick={() => setOpen(false)} className="block py-5">
                       <span className="type-display text-[clamp(3rem,13vw,4.75rem)] leading-[0.9]">
                         {link.label}
                       </span>
